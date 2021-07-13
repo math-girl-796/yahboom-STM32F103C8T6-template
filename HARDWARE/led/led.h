@@ -3,6 +3,8 @@
 
 #include "stm32f10x.h"
 
+// 该器件初始化后会占用PC13管脚
+
 void led_init(void);
 u8 led_state(void);
 void led_on(void);
