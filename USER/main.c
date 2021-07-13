@@ -1,5 +1,6 @@
 #include "stm32f10x.h"
 #include "led.h"
+#include "delay.h"
 
 
 void Delay(u32 count)
@@ -11,14 +12,13 @@ void Delay(u32 count)
 int main(void)
 {
 	led_init();
+	delay_init();
 	
-	led_on();
+	
+	led_off();
 	
 	while(1)
 	{
-//		GPIO_ResetBits(GPIOB,GPIO_Pin_13);
-//		Delay(3000000);
-//		GPIO_SetBits(GPIOB,GPIO_Pin_13);
-//		Delay(3000000);
+		led_blink5();
 	}
 }

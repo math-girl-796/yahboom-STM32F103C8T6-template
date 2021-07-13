@@ -55,3 +55,164 @@ void led_switch(void)
 	if(led_state()) led_off();
 	else led_on();
 }
+
+
+//延时一段较短的时间
+void led_delay()
+{
+	u32 i=0;
+	for(;i<1000000;i++);
+}
+// 一些闪烁模式，内部自带延时，外部不需要再加延时
+
+// 均匀快闪
+void led_blink1(void)
+{
+	led_on();
+	led_delay();
+	led_off();
+	led_delay();
+}
+
+
+// 均匀慢闪
+void led_blink2(void)
+{
+	led_on();
+	led_delay();
+	led_delay();
+	led_off();
+	led_delay();
+	led_delay();
+}
+
+
+// 快慢交替
+void led_blink3(void)
+{
+	static u8 speed = 1;
+	if (speed == 1) 
+	{
+		led_on();
+		led_delay();
+		led_off();
+		led_delay();
+		speed = 2;
+	}
+	else
+	{
+		led_on();
+		led_delay();
+		led_delay();
+		led_off();
+		led_delay();
+		led_delay();
+		speed = 1;
+	}
+	
+
+}
+
+
+// 快快慢慢
+void led_blink4(void)
+{
+	static u8 speed = 1;
+	if (speed == 1) 
+	{
+		led_on();
+		led_delay();
+		led_off();
+		led_delay();
+		speed = 2;
+	}
+	else if (speed == 2)
+	{
+		led_on();
+		led_delay();
+		led_off();
+		led_delay();
+		speed = 3;
+	}
+	else if (speed == 3)
+	{
+		led_on();
+		led_delay();
+		led_delay();
+		led_off();
+		led_delay();
+		led_delay();
+		speed = 4;
+	}
+	else
+	{
+		led_on();
+		led_delay();
+		led_delay();
+		led_off();
+		led_delay();
+		led_delay();
+		speed = 1;
+	}
+}
+
+
+// 快快快慢慢慢
+void led_blink5(void)
+{
+	static u8 speed = 1;
+	if (speed == 1) 
+	{
+		led_on();
+		led_delay();
+		led_off();
+		led_delay();
+		speed = 2;
+	}
+	else if (speed == 2)
+	{
+		led_on();
+		led_delay();
+		led_off();
+		led_delay();
+		speed = 3;
+	}
+	else if (speed == 3)
+	{
+		led_on();
+		led_delay();
+		led_off();
+		led_delay();
+		speed = 4;
+	}
+	else if (speed == 4)
+	{
+		led_on();
+		led_delay();
+		led_delay();
+		led_off();
+		led_delay();
+		led_delay();
+		speed = 5;
+	}
+	else if (speed == 5)
+	{
+		led_on();
+		led_delay();
+		led_delay();
+		led_off();
+		led_delay();
+		led_delay();
+		speed = 6;
+	}
+	else
+	{
+		led_on();
+		led_delay();
+		led_delay();
+		led_off();
+		led_delay();
+		led_delay();
+		speed = 1;
+	}
+}
