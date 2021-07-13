@@ -2,6 +2,8 @@
 #define __USART_H
 #include "stdio.h"	
 #include "sys.h" 
+#include <string.h>
+#include "delay.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //±¾³ÌĞòÖ»¹©Ñ§Ï°Ê¹ÓÃ£¬Î´¾­×÷ÕßĞí¿É£¬²»µÃÓÃÓÚÆäËüÈÎºÎÓÃÍ¾
 //ALIENTEK STM32¿ª·¢°å
@@ -33,6 +35,10 @@ extern u8  USART_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½
 extern u16 USART_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
 //Èç¹ûÏë´®¿ÚÖĞ¶Ï½ÓÊÕ£¬Çë²»Òª×¢ÊÍÒÔÏÂºê¶¨Òå
 void uart_init(u32 bound);
+
+
+//¶ÎÈ»×Ô¶¨Òåº¯Êı£º·¢ËÍÒ»¸ö×Ö·û´®(Ö»ÄÜ°üÀ¨×ÖÄ¸ºÍÊı×Ö)
+void uart_send_string(char* str);
 #endif
 
 

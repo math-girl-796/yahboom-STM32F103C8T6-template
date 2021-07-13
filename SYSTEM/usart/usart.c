@@ -162,3 +162,12 @@ void USART1_IRQHandler(void)                	//串口1中断服务程序
 } 
 #endif	
 
+void uart_send_string(char* str)
+{
+	int len = strlen(str);
+	int i = 0;
+	for (i = 0; i < len; i++) {
+		USART_SendData(USART1, (uint16_t)str[i]);
+		delay_us(100);	
+	}
+}
