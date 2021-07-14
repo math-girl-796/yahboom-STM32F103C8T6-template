@@ -1,6 +1,6 @@
 #include "rocker.h"
 
-// 初始化PA，占用PA1、PA2，需要PA1连接摇杆的VRx，PA2连接摇杆的VRy，摇杆的5V输入处连接3v3电压
+// 初始化PA，占用PA1、PA2，需要PA1连接摇杆的VRx，PA2连接摇杆的VRy，PA3连接摇杆的sw，摇杆的5V输入处连接3v3电压
 void rocker_init(void)
 {
 	ADC_InitTypeDef ADC_InitStructure; 
@@ -23,7 +23,7 @@ void rocker_init(void)
 	// 初始化PA3，用于摇杆按键
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;		//模拟输入引脚
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;		//0 1 输入
 	GPIO_Init(GPIOA, &GPIO_InitStructure);	
 
 	// 初始化ADC1
