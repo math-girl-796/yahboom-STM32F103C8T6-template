@@ -6,26 +6,50 @@
 #include "timer3.h"
 #include <stdio.h>
 #include <string.h>
+#include "stepper_motor.h"
 
+void test_led(void);
 void test_rocker(void);
 void test_timer3(void);
 void test_pwm(void);
-//void test_pwm_and_rocker(void);
+//void test_pwm_and_rocker(void);// 未通过测试
 void test_steer(void);
+void test_stepper_motor(void);
 
 
 int main(void)
 {
-	test_steer();
+	test_stepper_motor();
+}
+
+void test_led(void)
+{
+	led_init();
+	
+	led_on();
+	
+	while(1);
+}
+
+void test_stepper_motor(void)
+{
+//	int i;
+	
+	led_init();
+	stepper_motor_init();
+	delay_init();
+	
+	while(1)
+	{
+		stepper_motor_ctrl(CW, 540, 7000);
+		stepper_motor_ctrl(CCW, 180, 7000);
+	}
 }
 
 
 // 连接PA6到9g舵机控制口
 void test_steer(void)
 {
-	
-	int pos = 0;
-	
 	delay_init();
 	
 	TIM3_CH1_PWM_Init(19999, 71);
@@ -46,6 +70,7 @@ void test_steer(void)
 
 // 这个不好使，舵机疯狂抖
 // PA6连在9g舵机控制输入上，或者飞线到PC13也行
+// 下一步改进计划：把x映射到500-2500，然后用TIM_SetCompare设置舵机的角度
 void test_pwm_and_rocker(void)
 {
 	float duration = 0;
