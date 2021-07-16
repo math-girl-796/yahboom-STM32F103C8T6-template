@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\key;..\HARDWARE\led;..\HARDWARE\rocker;..\HARDWARE\timer3;..\HARDWARE\bsp_motor;..\HARDWARE\step_motor</IncludePath>
+              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\key;..\HARDWARE\led;..\HARDWARE\rocker;..\HARDWARE\timer3;..\HARDWARE\step_motor</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -573,11 +573,6 @@
               <FileName>timer3.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\timer3\timer3.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\bsp_motor\bsp_motor.c</FilePath>
             </File>
             <File>
               <FileName>stepper_motor.c</FileName>

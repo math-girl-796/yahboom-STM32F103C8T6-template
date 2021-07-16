@@ -15,20 +15,116 @@ void test_pwm(void);
 //void test_pwm_and_rocker(void);// 未通过测试
 void test_steer(void);
 void test_stepper_motor(void);
+void test_uart_and_motor(void);
+void test_uart1(void);
 
 
 int main(void)
 {
-	test_stepper_motor();
+	test_uart_and_motor();
 }
+
+void test_uart_and_motor(void)
+{
+	u8 direction = CW;
+	int cycle = 8000;
+	int len = 0;
+	u8 buf[5];
+	
+	delay_init();
+	uart1_init(115200);
+	stepper_motor_init();
+	
+
+	while(1)
+	{
+		if ((len = uart1_buf_status()) == 5)
+		{
+			u8 temp_direction;
+			int temp_cycle;
+			uart1_read_buf(buf, 5);
+			temp_direction = buf[0];
+			temp_cycle = buf[1] + (buf[2] << 8) + (buf[3] << 16) + (buf[4] << 24);
+			printf("%d\t%d\t", temp_direction, temp_cycle);
+			
+			if (temp_direction == CW || temp_direction == CCW)
+			{
+				direction = temp_direction;
+				printf("方向修改成功\t");
+			}
+			if (temp_cycle >= 7000)
+			{
+				cycle = temp_cycle;
+				printf("速度修改成功");
+			}
+			printf("\r\n");
+		}
+		else if (len > 0)
+		{
+			uart1_clear_buf();
+		}
+		
+		stepper_motor_ctrl_512(direction, 2, cycle);
+	}
+}
+
+void test_uart1(void)
+{
+	u8 len;	
+	u16 times=0;  
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
+	delay_init();		//延时初始化 
+	
+	uart1_init(115200);	//串口初始化波特率为115200
+	
+	led_init();
+	
+	
+	
+	while(1)
+	{
+		if((len = uart1_buf_status()) != 0)
+		{					   
+			u8 str[20];
+			
+			uart1_read_buf(str, len);
+			
+			uart1_send_bytes(str, len);
+			
+			uart1_clear_buf();
+			
+		}else
+		{
+			times++;
+			if(times%200==0)
+			{
+				static u8 a = 0;
+				
+				char str[10];
+				
+				sprintf(str, "%c%c\r\n", a+65, a+66);
+				
+				uart1_send_bytes((u8 *)str, 4);
+				
+				a ++;
+				a = a % 26;
+				
+				led_switch();
+			}
+			delay_ms(10);   
+		}
+	}
+}
+
 
 void test_led(void)
 {
 	led_init();
 	
-	led_on();
-	
-	while(1);
+	while(1)
+	{
+		led_blink3();
+	}
 }
 
 void test_stepper_motor(void)
@@ -41,8 +137,8 @@ void test_stepper_motor(void)
 	
 	while(1)
 	{
-		stepper_motor_ctrl(CW, 540, 7000);
-		stepper_motor_ctrl(CCW, 180, 7000);
+		stepper_motor_ctrl(CW, 90, 8000);
+		stepper_motor_ctrl(CCW, 90, 7000);
 	}
 }
 
@@ -85,7 +181,7 @@ void test_pwm_and_rocker(void)
 	delay_init();
 	led_init();
 	rocker_init();
-	uart_init(115200);
+	uart1_init(115200);
 	
 	while (1)
 	{
@@ -93,7 +189,7 @@ void test_pwm_and_rocker(void)
 		duration = ((x + 2048.) / 4096  + 1) / 40;
 		
 		sprintf(str, "%f\r\n", duration);
-		uart_send_string(str);
+		uart1_send_bytes((u8*)str, strlen(str));
 		
 		TIM3_CH1_PWM_SetDuration(duration);
 		
@@ -155,7 +251,7 @@ void test_rocker(void)
 	
 	delay_init();	    	 //延时函数初始化	  
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
-	uart_init(115200);	 //串口初始化为115200
+	uart1_init(115200);	 //串口初始化为115200
  	led_init();			     //LED端口初始化
  	
  	rocker_init();		  		//ADC初始化
@@ -172,7 +268,7 @@ void test_rocker(void)
 		
 		sprintf(str, "x:%d\ty:%d\tkey:%d\r\n", adcx1, adcx2, key);
 		
-		uart_send_string(str);
+		uart1_send_bytes((u8*)str, strlen(str));
 		
 //		led_switch();
 		delay_ms(500);	
