@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\key;..\HARDWARE\led;..\HARDWARE\rocker;..\HARDWARE\timer3;..\HARDWARE\step_motor</IncludePath>
+              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\led;..\HARDWARE\rocker;..\HARDWARE\timer3;..\HARDWARE\step_motor</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -558,11 +558,6 @@
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\led\led.c</FilePath>
-            </File>
-            <File>
-              <FileName>key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\key\key.c</FilePath>
             </File>
             <File>
               <FileName>rocker.c</FileName>
