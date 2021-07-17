@@ -17,12 +17,27 @@ void test_steer(void);
 void test_stepper_motor(void);
 void test_uart_and_motor(void);
 void test_uart1(void);
-
+void test_printf(void);
 
 int main(void)
 {
-	test_uart_and_motor();
+	test_printf();
 }
+
+void test_printf(void)
+{
+	uart1_init(115200);
+	delay_init();
+	led_init();
+	
+	while(1)
+	{
+		led_switch();
+		printf("hello\r\n");
+		delay_ms(200);
+	}
+}
+
 
 void test_uart_and_motor(void)
 {
