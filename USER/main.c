@@ -18,10 +18,16 @@ void test_stepper_motor(void);
 void test_uart_and_motor(void);
 void test_uart1(void);
 void test_printf(void);
+void test_uart2(void);
 
 int main(void)
 {
-	test_printf();
+	test_uart1();
+}
+
+void test_uart2(void)
+{
+	
 }
 
 void test_printf(void)
@@ -227,21 +233,21 @@ void test_pwm(void)
 	
 	while (1)
 	{
-		if (duration < 0) 
+		if (duration < 0.5) 
 		{
 			duration = 0;
 			direct = 1;
 		}
-		if (duration > 0.1) 
+		if (duration > 1) 
 		{
-			duration = 0.1;
+			duration = 1;
 			direct = 0;
 		}
 		if (direct == 1) duration += 0.001;
 		if (direct == 0) duration -= 0.001;
 		
 		TIM3_CH1_PWM_SetDuration(duration);
-		TIM3_CH2_PWM_SetDuration(0.1 - duration);
+		TIM3_CH2_PWM_SetDuration(1.5 - duration);
 		delay_ms(10);
 	}
 }

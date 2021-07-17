@@ -130,7 +130,7 @@ void TIM3_CH2_PWM_Init(u16 arr, u16 psc)
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 	
-	TIM3_CH1_PWM_ARR = arr + 1;
+	TIM3_CH2_PWM_ARR = arr + 1;
 	
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);	//使能定时器3时钟
