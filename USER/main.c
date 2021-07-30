@@ -18,15 +18,130 @@ void test_stepper_motor(void);
 void test_uart_and_motor(void);
 void test_uart1(void);
 void test_printf(void);
-void test_uart2(void);
+void test_uart3(void);
+void test_6050(void);
+void test_motor(void);
 
 int main(void)
 {
-	test_uart1();
+	test_motor();
 }
 
-void test_uart2(void)
+#include "motor.h"
+void test_motor(void)
 {
+	motor_init();
+	delay_init();
+	led_init();
+	
+	LeftMotor_Go();
+	RightMotor_Go();
+	while(1)
+	{
+		led_on();
+		LeftMotorPWM(3500);
+		RightMotorPWM(3500);
+		delay_ms(1000);
+		led_off();
+		LeftMotorPWM(7100);
+		RightMotorPWM(7100);
+		delay_ms(1000);
+		
+//		led_on();
+//		LeftMotor_Go();
+//		delay_ms(1000);
+//		LeftMotor_Back();
+//		delay_ms(1000);
+//		LeftMotor_Stop();
+//		delay_ms(1000);
+//		
+//		led_off();
+//		RightMotor_Go();
+//		delay_ms(1000);
+//		RightMotor_Back();
+//		delay_ms(1000);
+//		RightMotor_Stop();
+//		delay_ms(1000);
+	}
+}
+
+void test_uart3(void)
+{
+	led_init();
+	delay_init();
+	uart1_init(115200);
+	uart3_init(9600);
+	
+	while(1)
+	{
+		// uart3 接收到数据 转发到uart1
+		if (uart3NewLineReceived) 
+		{
+			printf("%s\r\n", USART3_RX_BUF);
+			memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));
+			uart3NewLineReceived = 0;
+		}
+		
+		// uart1 接收到数据 转发到uart3
+		int len = uart1_buf_status();
+		if (len != 0)
+		{
+			u8 buf[50];
+			uart1_read_buf(buf, len);
+			uart3_send_bytes(buf, len);
+		}
+	
+		
+		// 休息 + 显示工作状态
+		delay_ms(200);
+		led_switch();
+	}
+}
+
+
+#include "inv_mpu.h"
+#include "mpu6050.h"
+void test_6050(void)
+{
+	uart1_init(115200);
+	delay_init();
+	led_init();
+	MPU_Init();
+	
+	// 初始化mpu6050 dmp库
+	while(1)
+ 	{
+		u8 ret = mpu_dmp_init();
+		delay_ms(400);
+		led_switch();
+		if (ret != 0)
+		{
+			printf("mpu_dmp_init error: %d  \r\n", ret);
+		}
+		else
+		{
+			printf("mpu_dmp_init ok  \r\n");
+			break;
+		}
+	} 
+	
+	
+	// 从mpu6050 dmp中不断读数据，并发送到串口
+	float pitch, roll, yaw;
+	while (1)
+	{
+		u8 ret = mpu_dmp_get_data(&pitch,&roll,&yaw);
+		if (ret == 0)
+		{
+			printf("pitch: %f\t roll: %f\t yaw: %f\t   \r\n", pitch, roll, yaw);
+		}
+		else 
+		{
+//			printf("mpu_dmp_get_data error: %d  \r\n", ret);
+		}
+		delay_ms(200);
+		led_switch();
+	}
 	
 }
 

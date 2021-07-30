@@ -1,6 +1,6 @@
 #include "rocker.h"
 
-// 初始化PA，占用PA1、PA2，需要PA1连接摇杆的VRx，PA2连接摇杆的VRy，PA3连接摇杆的sw，摇杆的5V输入处连接3v3电压
+// 初始化PA，占用PA1、PA2、PA3，需要PA1连接摇杆的VRx，PA2连接摇杆的VRy，PA3连接摇杆的sw，摇杆的5V输入处连接3v3电压
 void rocker_init(void)
 {
 	ADC_InitTypeDef ADC_InitStructure; 
