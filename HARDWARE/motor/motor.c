@@ -53,7 +53,7 @@ void Motor_PWM_Init(u16 arr, u16 psc, u16 arr2, u16 psc2 )
 	
 	//////////PWMA PB6////////// TIM4 CH1
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);	
- 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB  | RCC_APB2Periph_AFIO, ENABLE);  //使能GPIO外设和AFIO复用功能模块时钟
+ 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);  //使能AFIO复用功能模块时钟
  
    //设置该引脚为复用输出功能,输出TIM4 CH1的PWM脉冲波形	GPIOB.6
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
@@ -102,10 +102,160 @@ void Motor_PWM_Init(u16 arr, u16 psc, u16 arr2, u16 psc2 )
 	TIM_Cmd(TIM4, ENABLE);  //使能TIM4
 }
 
+/*
+	正交解码初始化(电机测速) TIM2 Encoder 模式 PA0 PA1
+*/
+void TIM2_Encoder_Init(void)
+{
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_ICInitTypeDef TIM_ICInitStructure;
+  
+	GPIO_InitTypeDef GPIO_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	// 开启 [TIM2 GPIOA 复用功能] 时钟
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+
+	// 关闭jtag管脚复用
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);       
+
+	// 不使用重映射，因此CH1在PA0，CH2在PA1
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;         
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);    
+
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;         
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);   
+
+	// 开启TIM2更新中断
+	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	// 开始配置TIM2编码器模式
+	TIM_DeInit(TIM2);
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+
+	TIM_TimeBaseStructure.TIM_Prescaler = 0x0; 
+	TIM_TimeBaseStructure.TIM_Period = 65536-1;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  //设置时钟分频系数：不分频
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;  //向上计数模式 
+	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+
+	// 使用x倍精度模式
+	TIM_EncoderInterfaceConfig(TIM2, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising); 
+	TIM_ICStructInit(&TIM_ICInitStructure);
+	TIM_ICInitStructure.TIM_ICFilter = 0; //无滤波器
+	TIM_ICInit(TIM2, &TIM_ICInitStructure);
+
+	// Clear all pending interrupts
+	TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);	  //使能中断
+	TIM_SetCounter(TIM2,0);
+	TIM_Cmd(TIM2, ENABLE);  	   //使能定时器2
+}
+
+/*
+	正交解码初始化(电机测速) TIM3 Encoder 模式 PA6 PA7
+*/
+void TIM3_Encoder_Init(void)
+{
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_ICInitTypeDef TIM_ICInitStructure;
+  
+	GPIO_InitTypeDef GPIO_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	// 开启 [TIM3 GPIOA 复用功能] 时钟
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+
+	// 关闭jtag管脚复用
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);       
+
+	// 不使用重映射，因此CH1在PA6，CH2在PA7
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;         
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);    
+
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;         
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);   
+
+	// 开启TIM3更新中断
+	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	// 开始配置TIM3编码器模式
+	TIM_DeInit(TIM3);
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+
+	TIM_TimeBaseStructure.TIM_Prescaler = 0x0; 
+	TIM_TimeBaseStructure.TIM_Period = 65536-1;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  //设置时钟分频系数：不分频
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;  //向上计数模式 
+	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+
+	// 使用x倍精度模式
+	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising); 
+	TIM_ICStructInit(&TIM_ICInitStructure);
+	TIM_ICInitStructure.TIM_ICFilter = 0; //无滤波器
+	TIM_ICInit(TIM3, &TIM_ICInitStructure);
+
+	// Clear all pending interrupts
+	TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);	  //使能中断
+	TIM_SetCounter(TIM3, 0);
+	TIM_Cmd(TIM3, ENABLE);  	   //使能定时器3
+}
 
 
+// 读取定时器计数值
+u32 read_tim2_cnt(void)
+{
+	u32 encoder_cnt = TIM2->CNT;		//读取计数器CNT的值，CNT系uint32_t型的变量
+//	TIM_SetCounter(TIM2, 0);		//每一次读取完计数值后将计数值清零，重新开始累加脉冲，方便下一次计数
+	return encoder_cnt;				//返回的值就是本次读到的计数值
+}
+
+u32 read_tim3_cnt(void)
+{
+	u32 encoder_cnt = TIM3->CNT;		//读取计数器CNT的值，CNT系uint32_t型的变量
+//	TIM_SetCounter(TIM3, 0);		//每一次读取完计数值后将计数值清零，重新开始累加脉冲，方便下一次计数
+	return encoder_cnt;				//返回的值就是本次读到的计数值
+}
 
 
+void TIM2_IRQHandler(void)
+{ 		    		  			    
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)  //检查TIM3更新中断发生与否
+	{
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);  //清除TIMx更新中断标志 
+	}	    
+}
+
+void TIM3_IRQHandler(void)
+{ 		    		  			    
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)  //检查TIM3更新中断发生与否
+	{
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);  //清除TIMx更新中断标志 
+	}	    
+}
 
 
 
